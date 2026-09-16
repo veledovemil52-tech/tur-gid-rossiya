@@ -1,344 +1,598 @@
-import { useEffect } from "react";
 import "./App.css";
 
 const BOT_URL = "https://max.ru/se14052982_bot";
 
-const destinations = [
-  {
-    city: "Москва",
-    meta: "Красная площадь · парки · музеи",
-    className: "moscow",
-    image: "https://lifeglobe.net/x/entry/16572/1-1771442329553-469659072.jpg",
-  },
-  {
-    city: "Санкт-Петербург",
-    meta: "Эрмитаж · Невский · набережные",
-    className: "spb",
-    image: "https://applescoop.org/image/wallpapers/iphone/vintage-classic-old-winter-palace-saint-petersburg-russia-st-petersburg-soviet-union-style-architecture-01-12-2024-1733101258-hd-wallpaper.jpeg",
-  },
-  {
-    city: "Казань",
-    meta: "Кремль · Старо-Татарская слобода",
-    className: "kazan",
-    image: "https://radotagroup.com/wp-content/uploads/2023/10/200121.jpg",
-  },
-  {
-    city: "Сочи",
-    meta: "море · горы · прогулки",
-    className: "sochi",
-    image: "https://krasnodar.bz/upload/000/u29/2/9/sochi-prinjal-4-5-mln-turistov-s-nachala-2025-goda-photo-content-item.webp",
-  },
-  {
-    city: "Екатеринбург",
-    meta: "центр · Урал · современность",
-    className: "ekb",
-    image: "https://image.produktion.de/1731000.webp?format=jpg&height=720&imageId=1731000&width=960",
-  },
-  {
-    city: "Владивосток",
-    meta: "море · мосты · закаты",
-    className: "vlad",
-    image: "https://news.store.rambler.ru/img/eb259c2aefb4fab4aed1e7b8dff40dd4?img-1-resize=width%3A1280%2Cheight%3A960%2Cfit%3Acover&img-format=auto",
-  },
-];
-
-const steps = [
-  ["01", "⌖", "Выбираешь город", "Любой уголок России — от больших городов до скрытых жемчужин."],
-  ["02", "♙", "Рассказываешь о себе", "Интересы, бюджет, компания, количество дней и предпочтения."],
-  ["03", "✦", "Получаешь маршрут", "AI собирает план и показывает его в MAX с учётом твоих пожеланий."],
+const cities = [
+  [
+    "Москва",
+    "Столица в ритме большого города",
+    "https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&w=1200&q=88",
+  ],
+  [
+    "Санкт-Петербург",
+    "Архитектура, история и атмосфера Невы",
+    "https://images.unsplash.com/photo-1556610961-2fecc5927173?auto=format&fit=crop&w=1200&q=88",
+  ],
+  [
+    "Казань",
+    "Кремль, мечеть Кул-Шариф и восточный характер",
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Qol%C5%9F%C3%A4rif%20Mosque%20in%20Kazan%2C%20Russia.jpg",
+  ],
+  [
+    "Сочи",
+    "Море, пляж и вечерний курортный город",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=88",
+  ],
 ];
 
 const features = [
-  ["✦", "AI-маршрут", "Персональный план под твои интересы и темп."],
-  ["☁", "Погода", "Адаптируем маршрут под прогноз."],
-  ["₽", "Бюджет", "Помогаем спланировать поездку без лишних расходов."],
-  ["⌁", "Компания", "Подбираем формат для пары, друзей и семьи."],
-  ["⌖", "Карта", "Открывай готовый маршрут и строй путь."],
+  [
+    "01",
+    "✦",
+    "AI-маршрут",
+    "Персональная программа под твои интересы, компанию и бюджет.",
+  ],
+  [
+    "02",
+    "☼",
+    "Погода",
+    "Маршрут меняется под прогноз, чтобы плохая погода не сломала день.",
+  ],
+  [
+    "03",
+    "₽",
+    "Бюджет",
+    "Укажи сумму на поездку — ТурГид учитывает её при составлении маршрута.",
+  ],
+  [
+    "04",
+    "⌖",
+    "Карта",
+    "Готовый маршрут можно открыть на карте и сразу отправиться в путь.",
+  ],
+];
+
+const botScreens = [
+  [
+    "01",
+    "Выбор города",
+    "Найди город и начни настройку поездки",
+    "/bot-1.png",
+  ],
+  [
+    "02",
+    "Дни и бюджет",
+    "Задай длительность и сумму поездки",
+    "/bot-2.png",
+  ],
+  [
+    "03",
+    "Интересы",
+    "Выбери то, что действительно нравится",
+    "/bot-3.png",
+  ],
+  [
+    "04",
+    "Готовый маршрут",
+    "Получи маршрут и открой его на карте",
+    "/bot-4.png",
+  ],
 ];
 
 function App() {
-  useEffect(() => {
-    const elements = document.querySelectorAll(".reveal");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, []);
-
-  const openBot = () => {
-    window.open(BOT_URL, "_blank", "noopener,noreferrer");
-  };
-
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <div className="site">
+
+      {/* HEADER */}
       <header className="header">
-        <button className="brand" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          <span className="brand-mark">T</span>
-          <span>ТурГид <strong>Россия</strong></span>
-        </button>
+        <div className="header-inner">
 
-        <nav className="nav">
-          <button onClick={() => scrollTo("how")}>О проекте</button>
-          <button onClick={() => scrollTo("features")}>Возможности</button>
-          <button onClick={() => scrollTo("destinations")}>Направления</button>
-          <button onClick={openBot}>MAX</button>
-        </nav>
+          <a href="#top" className="brand">
+            <span className="brand-mark">T</span>
 
-        <button className="header-cta" onClick={openBot}>
-          Открыть в MAX <span>↗</span>
-        </button>
+            <span>
+              <strong>ТурГид</strong>
+              <small>РОССИЯ</small>
+            </span>
+          </a>
+
+          <nav>
+            <a href="#how">Как работает</a>
+            <a href="#features">Возможности</a>
+            <a href="#destinations">Направления</a>
+            <a href="#bot">MAX</a>
+          </nav>
+
+          <a
+            className="header-button"
+            href={BOT_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Открыть в MAX ↗
+          </a>
+
+        </div>
       </header>
 
-      <main>
-        <section className="hero">
-          <div className="hero-bg" aria-hidden="true">
-            <div className="hero-mountains back" />
-            <div className="hero-mountains front" />
-            <div className="hero-lake" />
-          </div>
-          <div className="hero-glow hero-glow-blue" />
-          <div className="hero-glow hero-glow-gold" />
+      <main id="top">
 
-          <div className="hero-copy reveal visible">
-            <span className="eyebrow">
-              <span className="status-dot" />
-              AI-помощник в путешествиях
-            </span>
+        {/* HERO */}
+        <section className="hero">
+
+          <div className="hero-copy">
+
+            <div className="eyebrow">
+              <i />
+              УМНЫЙ AI-ГИД ПО РОССИИ
+            </div>
 
             <h1>
               Путешествия
-              <span>начинаются</span>
-              <b>здесь.</b>
+              <em>начинаются</em>
+              здесь.
             </h1>
 
             <p>
-              ТурГид Россия — персональный AI-гид по России.
-              Маршрут, который подстраивается под твои интересы,
-              бюджет и погоду. Всё это — прямо в MAX.
+              ТурГид Россия создаёт персональные маршруты по городам России
+              с учётом твоих интересов, бюджета, компании и погоды.
             </p>
 
             <div className="hero-actions">
-              <button className="primary-btn" onClick={openBot}>
-                <span className="max-dot">◉</span>
-                Открыть в MAX
-                <b>→</b>
-              </button>
 
-              <button className="qr-mini" onClick={openBot}>
-                <span className="qr-mini-icon">⌗</span>
-                <span>
-                  <strong>Сканируй QR</strong>
-                  <small>и открой бота</small>
-                </span>
-              </button>
-            </div>
-
-            <div className="hero-stats">
-              <div><strong>89+</strong><span>городов России</span></div>
-              <div><strong>AI</strong><span>персональный маршрут</span></div>
-              <div><strong>24/7</strong><span>помощник в поездке</span></div>
-            </div>
-          </div>
-
-          <div className="hero-phone-wrap reveal visible">
-            <div className="hero-phone">
-              <div className="phone-top">
-                <span>9:41</span><span className="phone-island" /><span>•••</span>
-              </div>
-
-              <div className="phone-title">
-                <span className="phone-logo">T</span>
-                <div><strong>ТурГид Россия</strong><small>Бот</small></div>
-              </div>
-
-              <div className="phone-bubble">
-                <strong>Привет! 👋</strong>
-                <p>Я — ТурГид Россия. Помогу спланировать твоё путешествие по России.</p>
-              </div>
-
-              <div className="phone-label">Популярные города</div>
-              <div className="phone-cities">
-                <span>Москва</span>
-                <span>Санкт-Петербург</span>
-                <span>Казань</span>
-              </div>
-
-              <div className="phone-input">
-                <span>Написать сообщение...</span><b>→</b>
-              </div>
-            </div>
-
-            <div className="hero-qr-card">
-              <div className="qr-image-shell">
-                <img src="/qr.svg" alt="QR-код ТурГид Россия в MAX" />
-              </div>
-              <div className="max-word">◉ max</div>
-              <p>Сканируй QR<br />и начни путешествие<br />с ТурГид Россия в MAX</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="intro-strip reveal">
-          <span>Планируй меньше.</span>
-          <strong>Путешествуй больше.</strong>
-          <span>Остальное сделает ТурГид.</span>
-        </section>
-
-        <section className="how-section" id="how">
-          <div className="section-topline reveal">
-            <div>
-              <h2>Как это работает?</h2>
-              <p>Всего 3 шага — и твой маршрут готов.</p>
-            </div>
-            <div className="hand-note">Твой идеальный<br />маршрут — всего<br />в пару кликов <b>↗</b></div>
-          </div>
-
-          <div className="steps">
-            {steps.map(([number, icon, title, text], index) => (
-              <article className={`step reveal delay-${index + 1}`} key={number}>
-                <div className="step-number">{number}</div>
-                <div className="step-icon">{icon}</div>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="destinations-section" id="destinations">
-          <div className="destination-heading reveal">
-            <div>
-              <span className="pill-label">НАПРАВЛЕНИЯ</span>
-              <h2>Россия, которую<br /><em>хочется открыть.</em></h2>
-              <p>От больших городов до живописных природных уголков — выбирай своё направление.</p>
-              <button className="dark-btn" onClick={openBot}>Открыть в MAX <span>→</span></button>
-            </div>
-            <div className="destination-scroll-arrow">→</div>
-          </div>
-
-          <div className="destination-list">
-            {destinations.map((item, index) => (
-              <button
-                className={`destination-card reveal delay-${(index % 3) + 1}`}
-                key={item.city}
-                onClick={openBot}
-                style={{ "--city-image": `url("${item.image}")` }}
+              <a
+                className="primary-button"
+                href={BOT_URL}
+                target="_blank"
+                rel="noreferrer"
               >
-                <div className="destination-shade" />
-                <div className="destination-body">
-                  <div className="destination-index">0{index + 1}</div>
-                  <div>
-                    <h3>{item.city}</h3>
-                    <p>{item.meta}</p>
-                  </div>
-                </div>
-                <span className="destination-arrow">↗</span>
-              </button>
-            ))}
-          </div>
-        </section>
+                Спланировать путешествие
+                <b>→</b>
+              </a>
 
-        <section className="features-section" id="features">
-          <div className="feature-intro reveal">
-            <span className="pill-label">ВОЗМОЖНОСТИ</span>
-            <h2>Больше, чем просто<br /><em>маршрут.</em></h2>
-            <p>ТурГид Россия учитывает всё, чтобы твоё путешествие было идеальным.</p>
-          </div>
+              <a className="secondary-button" href="#how">
+                Как это работает
+              </a>
 
-          <div className="feature-list">
-            {features.map(([icon, title, text], index) => (
-              <article className={`feature reveal delay-${(index % 3) + 1}`} key={title}>
-                <div className="feature-top">
-                  <span className={`feature-round round-${index}`}>{icon}</span>
-                  <span>0{index + 1}</span>
-                </div>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
+            </div>
 
-            <div className="max-card reveal">
+            <div className="stats">
+
               <div>
-                <div className="max-card-title"><span className="max-card-logo">◉</span><strong>ТурГид Россия</strong></div>
-                <small>уже в MAX</small>
-                <button onClick={openBot}>Открыть в MAX →</button>
+                <strong>89+</strong>
+                <span>городов России</span>
               </div>
-              <div className="max-card-qr"><img src="/qr.svg" alt="QR-код MAX" /></div>
+
+              <div>
+                <strong>AI</strong>
+                <span>персональный маршрут</span>
+              </div>
+
+              <div>
+                <strong>24/7</strong>
+                <span>помощник в поездке</span>
+              </div>
+
             </div>
+
           </div>
+
+          <div className="hero-visual">
+
+            <div className="hero-photo">
+
+              <span className="hero-photo-title">
+                Путешествие
+                <br />
+                по России
+              </span>
+
+              <span className="hero-photo-caption">
+                Россия —
+                <em>это близко.</em>
+              </span>
+
+            </div>
+
+            <div className="hero-chip weather">
+              <span>☀️</span>
+              <b>+18°</b>
+              <small>погода учтена</small>
+            </div>
+
+            <div className="hero-chip route">
+              <span>✦</span>
+
+              <div>
+                <small>AI-МАРШРУТ</small>
+                <b>Маршрут готов</b>
+              </div>
+            </div>
+
+          </div>
+
         </section>
 
-        <section className="max-section reveal">
-          <div className="max-copy">
-            <span className="pill-label">04 / ОСНОВНОЙ ПРОДУКТ</span>
-            <h2>Весь ТурГид<br /><em>уже внутри MAX.</em></h2>
-            <p>
-              Сайт знакомит с проектом, а настоящая поездка строится внутри MAX —
-              от выбора города до готового маршрута, погоды и карты.
-            </p>
-            <button className="primary-btn light" onClick={openBot}>
-              Открыть ТурГид в MAX <b>→</b>
-            </button>
+        {/* HOW IT WORKS */}
+        <section className="how dark" id="how">
+
+          <div className="wrap">
+
+            <div className="how-head">
+
+              <div>
+
+                <div className="eyebrow light">
+                  <i />
+                  КАК ЭТО РАБОТАЕТ
+                </div>
+
+                <h2>
+                  Три шага до
+                  <br />
+                  <em>готового маршрута.</em>
+                </h2>
+
+              </div>
+
+              <p>
+                Простой диалог внутри MAX:
+                город → параметры поездки → готовый маршрут.
+              </p>
+
+            </div>
+
+            <div className="steps">
+
+              <article>
+                <small>01</small>
+
+                <span>⌖</span>
+
+                <h3>Выбери город</h3>
+
+                <p>
+                  Москва, Петербург, Казань,
+                  Сочи или любой другой город России.
+                </p>
+              </article>
+
+              <article>
+                <small>02</small>
+
+                <span>◌</span>
+
+                <h3>Расскажи о поездке</h3>
+
+                <p>
+                  Компания, количество дней,
+                  бюджет и интересы.
+                </p>
+              </article>
+
+              <article>
+                <small>03</small>
+
+                <span>✦</span>
+
+                <h3>Получи маршрут</h3>
+
+                <p>
+                  AI соберёт программу по дням
+                  с учётом погоды и твоих пожеланий.
+                </p>
+              </article>
+
+            </div>
+
           </div>
 
-          <div className="max-phone">
-            <div className="max-phone-bar" />
-            <div className="max-chat-head">
-              <span className="phone-logo dark">T</span>
-              <strong>ТурГид Россия</strong>
-              <span>•••</span>
-            </div>
-            <div className="max-chat-message">
-              <small>ТурГид AI</small>
-              <p>Готово! Я собрал маршрут на 3 дня и учёл прогноз погоды, бюджет и твои интересы.</p>
-            </div>
-            <div className="max-chat-route">
-              <span>⌖</span>
-              <div><small>Сегодня</small><strong>Красная площадь → Зарядье</strong></div>
-            </div>
-            <div className="max-chat-btn">🗺️ Открыть маршрут</div>
-          </div>
-
-          <div className="max-section-mountains" />
         </section>
 
-        <section className="final-cta reveal">
+        {/* FEATURES */}
+        <section className="features" id="features">
+
+          <div className="wrap">
+
+            <div className="section-head">
+
+              <div>
+
+                <div className="eyebrow">
+                  <i />
+                  ВОЗМОЖНОСТИ
+                </div>
+
+                <h2>
+                  Не просто гид.
+                  <br />
+                  <em>Твой персональный</em>
+                  <br />
+                  помощник.
+                </h2>
+
+              </div>
+
+              <p>
+                ТурГид учитывает интересы,
+                бюджет и погоду и собирает
+                поездку в одном месте.
+              </p>
+
+            </div>
+
+            <div className="feature-grid">
+
+              {features.map(([number, icon, title, text]) => (
+
+                <article className="feature" key={number}>
+
+                  <div className="feature-top">
+
+                    <span>{icon}</span>
+
+                    <small>{number}</small>
+
+                  </div>
+
+                  <div>
+
+                    <h3>{title}</h3>
+
+                    <p>{text}</p>
+
+                  </div>
+
+                  <b>↗</b>
+
+                </article>
+
+              ))}
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* DESTINATIONS */}
+        <section className="destinations dark" id="destinations">
+
+          <div className="wrap">
+
+            <div className="section-head dest-head">
+
+              <div>
+
+                <div className="eyebrow light">
+                  <i />
+                  НАПРАВЛЕНИЯ
+                </div>
+
+                <h2>
+                  Куда отправимся
+                  <br />
+                  <em>сегодня?</em>
+                </h2>
+
+              </div>
+
+              <p>
+                Выбирай город —
+                маршрут соберёт ТурГид внутри MAX.
+              </p>
+
+            </div>
+
+            <div className="city-grid">
+
+              {cities.map(([name, subtitle, image], index) => (
+
+                <a
+                  className="city"
+                  href={BOT_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  key={name}
+                >
+
+                  <img
+                    src={image}
+                    alt={name}
+                  />
+
+                  <div className="city-overlay" />
+
+                  <small>
+                    0{index + 1}
+                  </small>
+
+                  <div>
+
+                    <h3>{name}</h3>
+
+                    <p>{subtitle}</p>
+
+                  </div>
+
+                  <b>↗</b>
+
+                </a>
+
+              ))}
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* REAL BOT */}
+        <section className="bot" id="bot">
+
+          <div className="wrap">
+
+            <div className="section-head bot-head">
+
+              <div>
+
+                <div className="eyebrow">
+                  <i />
+                  РЕАЛЬНЫЙ БОТ
+                </div>
+
+                <h2>
+                  Как ТурГид
+                  <br />
+                  <em>выглядит в MAX.</em>
+                </h2>
+
+              </div>
+
+              <p>
+                Настоящие экраны работающего проекта —
+                от выбора города до готового маршрута.
+              </p>
+
+            </div>
+
+            <div className="screens">
+
+              {botScreens.map(
+                ([number, title, text, image]) => (
+
+                  <article
+                    className="screen-card"
+                    key={image}
+                  >
+
+                    <div className="screen-image">
+
+                      <img
+                        src={image}
+                        alt={title}
+                      />
+
+                    </div>
+
+                    <small>{number}</small>
+
+                    <h3>{title}</h3>
+
+                    <p>{text}</p>
+
+                  </article>
+
+                )
+              )}
+
+            </div>
+
+            <div className="bot-cta">
+
+              <div>
+
+                <small>
+                  ТУРГИД РОССИЯ × MAX
+                </small>
+
+                <h3>
+                  Попробуй сам.
+                </h3>
+
+              </div>
+
+              <a
+                className="primary-button"
+                href={BOT_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Открыть бота в MAX
+                <b>↗</b>
+              </a>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* FINAL */}
+        <section className="final">
+
           <div>
-            <span className="pill-label">ГОТОВ?</span>
-            <h2>Твоё следующее<br /><em>путешествие уже ждёт.</em></h2>
+
+            <div className="eyebrow light">
+              <i />
+              ГОТОВ?
+            </div>
+
+            <h2>
+              Россия ближе,
+              <br />
+              <em>чем кажется.</em>
+            </h2>
+
+            <p>
+              Выбери город. Расскажи о своих планах.
+              Остальное сделает ТурГид.
+            </p>
+
+            <a
+              className="primary-button"
+              href={BOT_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Спланировать путешествие
+              <b>→</b>
+            </a>
+
           </div>
-          <button className="primary-btn" onClick={openBot}>Спланировать путешествие <b>→</b></button>
+
         </section>
+
       </main>
 
-      <footer className="footer">
-        <div className="footer-brand">
-          <span className="brand-mark">T</span>
-          <span>ТурГид <strong>Россия</strong></span>
+      {/* FOOTER */}
+      <footer>
+
+        <div className="footer-inner">
+
+          <a href="#top" className="brand">
+
+            <span className="brand-mark">
+              T
+            </span>
+
+            <span>
+              <strong>ТурГид</strong>
+              <small>РОССИЯ</small>
+            </span>
+
+          </a>
+
+          <span>
+            Умные путешествия по России
+          </span>
+
+          <a
+            href={BOT_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            MAX ↗
+          </a>
+
+          <span>
+            © 2026
+          </span>
+
         </div>
-        <span>Умные путешествия по России</span>
-        <div className="footer-links">
-          <button onClick={() => scrollTo("how")}>О проекте</button>
-          <button onClick={() => scrollTo("features")}>Возможности</button>
-          <button onClick={() => scrollTo("destinations")}>Направления</button>
-          <button onClick={openBot}>MAX</button>
-        </div>
-        <span>© 2026</span>
+
       </footer>
+
     </div>
   );
 }
