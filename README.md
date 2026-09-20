@@ -1,16 +1,113 @@
-# React + Vite
+# ТурГид Россия
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+AI-гид по городам России внутри MAX. Пользователь проходит короткий диалог: город → компания → длительность → бюджет → интересы → персональный маршрут → карта.
 
-Currently, two official plugins are available:
+## Что решает проект
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+«ТурГид Россия» сокращает ручную сборку поездки из разных сервисов. Бот собирает ключевые вводные пользователя, получает прогноз погоды и формирует персональный маршрут.
 
-## React Compiler
+## Основной сценарий
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Пользователь открывает бота в MAX.
+2. Выбирает или ищет российский город.
+3. Указывает компанию и количество дней.
+4. Вводит бюджет на поездку.
+5. Выбирает несколько интересов.
+6. Нажимает «Готово — продолжить».
+7. Бот генерирует маршрут с учётом погоды.
+8. Пользователь может открыть маршрут на карте или перестроить отдельный день.
 
-## Expanding the Oxlint configuration
+## MAX-бот
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+https://max.ru/se14052982_bot
+
+## Веб-сайт
+
+https://tur-gid-rossiya77.vercel.app/
+
+## Технологии
+
+- Python
+- MAX Bot API
+- GigaChat API
+- Open-Meteo Geocoding API / Forecast API
+- Nominatim / OpenStreetMap
+- Яндекс Карты
+- Docker / Docker Compose
+- React + Vite (веб-витрина)
+
+## Структура
+
+```text
+.
+├── bot/
+│   ├── bot.py
+│   └── requirements.txt
+├── src/                  # веб-витрина React/Vite
+├── public/               # изображения сайта
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── .env.example
+└── README.md
+```
+
+## Переменные окружения
+
+Создай локальный файл `.env` на основе `.env.example`:
+
+```env
+MAX_BOT_TOKEN=...
+GIGACHAT_AUTH_KEY=...
+```
+
+Рабочие токены и ключи не должны попадать в Git.
+
+## Локальный запуск бота
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r bot/requirements.txt
+cp .env.example .env
+python3 bot/bot.py
+```
+
+## Запуск через Docker
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Для остановки:
+
+```bash
+docker compose down
+```
+
+## Проверка основного сценария
+
+Проверить:
+
+- первый запуск и приветствие;
+- точный ввод города (например, «Москва»);
+- поиск по первым буквам;
+- 1–30 дней и пользовательское количество;
+- ввод корректного и некорректного бюджета;
+- выбор нескольких интересов;
+- «Готово — продолжить»;
+- генерацию маршрута;
+- открытие маршрута на карте;
+- перестройку дня;
+- замену уже посещённого места;
+- новый маршрут;
+- поведение при временной недоступности внешнего сервиса.
+
+## Ограничения MVP
+
+Прогноз погоды используется в пределах доступного горизонта; при его превышении бот сообщает об ограничении. Качество отдельных рекомендаций зависит от внешних API и генеративной модели, поэтому перед промышленным запуском необходимы пилот и дополнительные проверки данных.
+
+## Безопасность
+
+`.env` не коммитится. В репозитории хранится только `.env.example` с пустыми значениями.
